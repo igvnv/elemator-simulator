@@ -1,0 +1,56 @@
+@use './floor';
+
+.elevator {
+  @include floor.floor-block;
+
+  background: black;
+  border-top: none;
+  box-shadow: 0 0 15px rgba(0, 0, 0, 0.25), 0 2px 4px rgba(0, 0, 0, 0.5);
+  left: 50%;
+  overflow: hidden;
+  position: absolute;
+  transform: translateX(-50%);
+  transition: all 0.2s linear;
+  z-index: 10;
+}
+
+.elevator__doors {
+  height: 100%;
+  left: 0;
+  position: absolute;
+  top: 0;
+  width: 100%;
+
+  &::before,
+  &::after {
+    background-color: brown;
+    border: 0 solid crimson;
+    border-right-width: 1px;
+    content: '';
+    height: 100%;
+    left: 0;
+    position: absolute;
+    top: 0;
+    transition: all 0.2s;
+    width: 50%;
+  }
+
+  &::after {
+    border-left-width: 1px;
+    border-right-width: 0;
+    left: auto;
+    right: 0;
+  }
+}
+
+.elevator__doors_opened {
+  &::before {
+    margin-left: -45%;
+    transition-delay: 0.5s;
+  }
+
+  &::after {
+    margin-right: -45%;
+    transition-delay: 0.5s;
+  }
+}

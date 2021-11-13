@@ -1,0 +1,21 @@
+.simulator {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  height: 100%;
+  margin: 0 auto;
+  max-width: 700px;
+  width: 100%;
+}
+
+.simulator__title {
+  margin: 0;
+  padding: 8px;
+  text-align: center;
+}
+
+.simulator__screen {
+  display: grid;
+  gap: 16px;
+  grid-template-columns: 1fr 1fr;
+}
