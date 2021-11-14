@@ -1,5 +1,6 @@
 {
-  "name": "marvia",
+  "name": "elevator-simulator",
+  "homepage": "https://rpetrov.ru/elevator-simulator/",
   "version": "0.1.0",
   "private": true,
   "dependencies": {
