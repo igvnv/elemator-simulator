@@ -1,4 +1,4 @@
-import { calculateRoute } from './elevator-router';
+import { calculateRoute } from '../utils/elevator-router';
 
 describe('Elevator router', () => {
   describe('Only one floor to visit', () => {

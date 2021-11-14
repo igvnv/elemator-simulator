@@ -22,6 +22,11 @@ export const ControlPanel: React.FC = observer(() => {
         {elevatorController.floorsNumbers.map((floorNumber) => (
           <button
             className="control-panel__button"
+            data-open={
+              elevatorController.currentFloor === floorNumber &&
+              (elevatorController.status === ElevatorStatus.DoorsOpen ||
+                elevatorController.status === ElevatorStatus.Idling)
+            }
             data-current={floorNumber === elevatorController.currentFloor}
             data-in-queue={
               elevatorController.route.includes(floorNumber) ||
