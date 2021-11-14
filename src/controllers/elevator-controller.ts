@@ -3,6 +3,8 @@ import { Config } from '../config';
 import { ElevatorStatus, elevatorStatusLabel } from '../types';
 import { calculateRoute } from '../utils/elevator-router';
 
+type RequestDirection = 'up' | 'down';
+
 /**
  * Elevator controller.
  *
@@ -13,7 +15,8 @@ export class ElevatorController {
   public currentFloor: number;
   public nextStopFloor?: number;
   public status: ElevatorStatus = ElevatorStatus.Idling;
-  public route: number[] = [];
+  private route: number[] = [];
+  private floorsInQueue: Array<[number, RequestDirection | undefined]> = [];
 
   /** Time from start floor before next stop. */
   public travelTime: number = 0;
@@ -37,28 +40,88 @@ export class ElevatorController {
     );
 
     this.floorReached = this.floorReached.bind(this);
-    this.pressControlPanelButton = this.pressControlPanelButton.bind(this);
+    this.pressElevatorPanelButton = this.pressElevatorPanelButton.bind(this);
+    this.pressFloorPanelButton = this.pressFloorPanelButton.bind(this);
     this.startRoute = this.startRoute.bind(this);
   }
 
-  public pressControlPanelButton(floor: number) {
+  /**
+   * Handles floor panel buttons presses.
+   */
+  public pressFloorPanelButton(floor: number, direction: RequestDirection) {
+    this.addFloor(floor, direction);
+  }
+
+  /**
+   * Handles elevator buttons presses.
+   */
+  public pressElevatorPanelButton(floor: number) {
+    this.addFloor(floor);
+  }
+
+  /**
+   * Decides if the floor in queue (for direction or independent of direction).
+   */
+  public isFloorButtonInQueue(
+    floor: number,
+    direction?: RequestDirection
+  ): boolean {
+    if (this.nextStopFloor === floor) {
+      return true;
+    }
+
+    if (this.route.includes(floor)) {
+      return true;
+    }
+
+    return !!this.floorsInQueue.find(
+      ([queueFloor, queueDirection]) =>
+        floor === queueFloor && (direction === queueDirection || !direction)
+    );
+  }
+
+  private addFloor(floor: number, direction?: RequestDirection) {
     // Skips unnecessary floors: already existed in route and current.
     if (this.route.includes(floor) || floor === this.currentFloor) {
       return;
     }
 
-    this.route = [...this.route, floor];
-    this.routeCalculated = false;
+    // If elevator is idling then add to route and start work.
+    if (
+      this.status === ElevatorStatus.Idling ||
+      this.status === ElevatorStatus.DoorsOpen
+    ) {
+      this.route = [...this.route, floor];
+      this.routeCalculated = false;
 
-    if (this.buttonPressDelayTimeout) {
-      clearTimeout(this.buttonPressDelayTimeout);
+      if (this.buttonPressDelayTimeout) {
+        clearTimeout(this.buttonPressDelayTimeout);
+      }
+
+      // Starting route after configured delay.
+      this.buttonPressDelayTimeout = setTimeout(
+        this.startRoute,
+        Config.buttonPressDelay
+      );
+
+      return;
     }
 
-    // Starting route after configured delay.
-    this.buttonPressDelayTimeout = setTimeout(
-      this.startRoute,
-      Config.buttonPressDelay
-    );
+    // If requested floor is on current direction then add floor to the route.
+    if (
+      ((!direction || direction === 'up') &&
+        this.status === ElevatorStatus.MovingUp &&
+        floor > this.currentFloor) ||
+      ((!direction || direction === 'down') &&
+        this.status === ElevatorStatus.MovingDown &&
+        floor < this.currentFloor)
+    ) {
+      this.route = [...this.route, floor];
+      this.routeCalculated = false;
+      return;
+    }
+
+    this.floorsInQueue = [...this.floorsInQueue, [floor, direction]];
   }
 
   private startRoute() {
@@ -125,12 +188,23 @@ export class ElevatorController {
     if (floorNumber === this.nextStopFloor) {
       this.currentFloor = this.nextStopFloor!;
 
+      // Floors queue is not empty, add them to route and mark route as updated.
+      if (this.floorsInQueue.length) {
+        const floors = Array.from(
+          new Set(this.floorsInQueue.map(([floor]) => floor))
+        );
+        this.route = [...this.route, ...floors];
+        this.floorsInQueue = [];
+        this.routeCalculated = true;
+      }
+
       setTimeout(() => {
         runInAction(() => {
           this.status = ElevatorStatus.DoorsOpen;
           setTimeout(this.startRoute, Config.doorsOpenDuration);
         });
       }, Config.floorTravelDuration);
+
       return;
     }
 

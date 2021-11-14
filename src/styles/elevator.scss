@@ -9,7 +9,7 @@
   left: 50%;
   overflow: hidden;
   position: absolute;
-  transform: translateX(-50%);
+  transform: translate(calc(-50% + 42px), 1px);
   transition: all 0.2s linear;
   z-index: 10;
 }

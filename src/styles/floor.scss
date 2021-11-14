@@ -10,16 +10,23 @@
 }
 
 .floor {
-  @include floor-block;
+  align-items: center;
+  display: flex;
+  gap: 8px;
 }
 
 .floor__number {
+  @include floor-block;
+
+  align-items: center;
   color: white;
+  display: flex;
   font-size: 64px;
   font-weight: bold;
-  left: 50%;
+  justify-content: center;
   pointer-events: none;
-  position: absolute;
-  top: 50%;
-  transform: translate(-50%, -50%);
+}
+
+.floor__control-panel {
+  width: 75px;
 }

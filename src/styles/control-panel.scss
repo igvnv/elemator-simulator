@@ -7,6 +7,13 @@
   padding: 8px;
 }
 
+.control-panel_small {
+  box-shadow: 0 2px 2px rgba(0, 0, 0, 0.2), 0 1px 18px rgba(0, 0, 0, 0.05);
+  display: flex;
+  justify-content: space-between;
+  padding: 6px;
+}
+
 .control-panel__buttons {
   display: flex;
   flex-wrap: wrap;
@@ -20,6 +27,7 @@
   border-radius: 50%;
   border-top-color: #bbb;
   height: 50px;
+  padding: 0;
   transition: all 0.2s;
   width: 50px;
 
@@ -34,6 +42,12 @@
   &[data-in-queue='true'] {
     background-color: #fce8b1;
   }
+}
+
+.control-panel__button_small {
+  border-width: 2px;
+  height: 30px;
+  width: 30px;
 }
 
 .control-panel__status {

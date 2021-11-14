@@ -12,7 +12,7 @@ export const ControlPanel: React.FC = observer(() => {
 
   const pressButtonHandler = (floorNumber: number): (() => void) => {
     return () => {
-      elevatorController.pressControlPanelButton(floorNumber);
+      elevatorController.pressElevatorPanelButton(floorNumber);
     };
   };
 
@@ -28,10 +28,7 @@ export const ControlPanel: React.FC = observer(() => {
                 elevatorController.status === ElevatorStatus.Idling)
             }
             data-current={floorNumber === elevatorController.currentFloor}
-            data-in-queue={
-              elevatorController.route.includes(floorNumber) ||
-              elevatorController.nextStopFloor === floorNumber
-            }
+            data-in-queue={elevatorController.isFloorButtonInQueue(floorNumber)}
             key={floorNumber}
             onClick={pressButtonHandler(floorNumber)}
           >
